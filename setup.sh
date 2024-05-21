@@ -66,7 +66,7 @@ fi
 NVIM_DIR=$HOME/tools/nvim
 NVIM_SRC_NAME=$HOME/packages/nvim-linux64.tar.gz
 NVIM_CONFIG_DIR=$HOME/.config/nvim
-NVIM_LINK="https://github.com/neovim/neovim/releases/download/v0.8.2/nvim-linux64.tar.gz"
+NVIM_LINK="https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz"
 if [[ ! -f "$NVIM_DIR/bin/nvim" ]]; then
     echo "Installing Nvim"
     echo "Creating nvim directory under tools directory"
@@ -83,6 +83,8 @@ if [[ ! -f "$NVIM_DIR/bin/nvim" ]]; then
     tar zxvf "$NVIM_SRC_NAME" --strip-components 1 -C "$NVIM_DIR"
 
     echo "export PATH=\"$NVIM_DIR/bin:\$PATH\"" >> "$HOME/.zshrc"
+
+    pip3 install pynvim
 else
     echo "Nvim is already installed. Skip installing it."
 fi
