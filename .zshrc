@@ -1,7 +1,7 @@
 # If you come from bash you might have to change your $PATH.
 #source ~/.bash_profile
 # Path to your oh-my-zsh installation.
-export ZSH="~/.oh-my-zsh"
+export ZSH="$HOME/.oh-my-zsh"
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
@@ -46,5 +46,5 @@ export NNN_TRASH=1
 # https://github.com/junegunn/fzf.vim/issues/453#issuecomment-526791474
 export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude={.git,.idea,.vscode,.sass-cache,node_modules,build,tmp}'
 
-eval "$(jump shell --bind=t)"
+# eval "$(autojump shell --bind=t)"
 

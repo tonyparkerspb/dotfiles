@@ -2,24 +2,6 @@
 set -exu
 set -o pipefail
 
-# Whether python3 has been installed on the system
-PYTHON_INSTALLED=false
-
-# If Python has been installed, then we need to know whether Python is provided
-# by the system, or you have already installed Python under your HOME.
-SYSTEM_PYTHON=false
-
-# If SYSTEM_PYTHON is false, we need to decide whether to install
-# Anaconda (INSTALL_ANACONDA=true) or Miniconda (INSTALL_ANACONDA=false)
-INSTALL_ANACONDA=false
-
-# Whether to add the path of the installed executables to system PATH
-ADD_TO_SYSTEM_PATH=true
-
-# select which shell we are using
-USE_ZSH_SHELL=true
-USE_BASH_SHELL=false
-
 if ! command -v zsh &> /dev/null
 then
   sudo apt install zsh
@@ -27,10 +9,15 @@ fi
 
 if [[ ! -d ~/.oh-my-zsh/ ]]; then
   sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  git clone https://github.com/zsh-users/zsh-autosuggestions $HOME/.oh-my-zsh/custom/plugins/zsh-autosuggestions
+  git clone https://github.com/zsh-users/zsh-syntax-highlighting.git $HOME/.oh-my-zsh/custom/plugins/zsh-syntax-highlighting
 fi
 
 if [[ ! -d ~/.nvm/ ]]; then
   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+  export NVM_DIR="$HOME/.nvm"
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
   nvm install --lts
   nvm use --lts
 fi
@@ -46,17 +33,11 @@ fi
 #######################################################################
 #                    Anaconda or miniconda install                    #
 #######################################################################
-if [[ "$INSTALL_ANACONDA" = true ]]; then
-    CONDA_DIR=$HOME/tools/anaconda
-    CONDA_NAME=Anaconda.sh
-    CONDA_LINK="https://mirrors.tuna.tsinghua.edu.cn/anaconda/archive/Anaconda3-2021.11-Linux-x86_64.sh"
-else
-    CONDA_DIR=$HOME/tools/miniconda
-    CONDA_NAME=Miniconda.sh
-    CONDA_LINK="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh"
-fi
+CONDA_DIR=$HOME/tools/miniconda
+CONDA_NAME=Miniconda.sh
+CONDA_LINK="https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda/Miniconda3-py39_4.10.3-Linux-x86_64.sh"
 
-if [[ ! "$PYTHON_INSTALLED" = true ]]; then
+if [[ ! -d "$CONDA_DIR" ]]; then
     echo "Installing Python in user HOME"
 
     SYSTEM_PYTHON=false
@@ -74,9 +55,7 @@ if [[ ! "$PYTHON_INSTALLED" = true ]]; then
     bash "$HOME/packages/$CONDA_NAME" -b -p "$CONDA_DIR"
 
     # Setting up environment variables
-    if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$CONDA_DIR/bin:\$PATH\"" >> "$HOME/.bash_profile"
-    fi
+    echo "export PATH=\"$CONDA_DIR/bin:\$PATH\"" >> "$HOME/.zshrc"
 else
     echo "Python is already installed. Skip installing it."
 fi
@@ -87,7 +66,7 @@ fi
 NVIM_DIR=$HOME/tools/nvim
 NVIM_SRC_NAME=$HOME/packages/nvim-linux64.tar.gz
 NVIM_CONFIG_DIR=$HOME/.config/nvim
-NVIM_LINK="https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz"
+NVIM_LINK="https://github.com/neovim/neovim/releases/download/v0.8.2/nvim-linux64.tar.gz"
 if [[ ! -f "$NVIM_DIR/bin/nvim" ]]; then
     echo "Installing Nvim"
     echo "Creating nvim directory under tools directory"
@@ -103,9 +82,7 @@ if [[ ! -f "$NVIM_DIR/bin/nvim" ]]; then
     echo "Extracting neovim"
     tar zxvf "$NVIM_SRC_NAME" --strip-components 1 -C "$NVIM_DIR"
 
-    if [[ "$ADD_TO_SYSTEM_PATH" = true ]] && [[ "$USE_BASH_SHELL" = true ]]; then
-        echo "export PATH=\"$NVIM_DIR/bin:\$PATH\"" >> "$HOME/.bash_profile"
-    fi
+    echo "export PATH=\"$NVIM_DIR/bin:\$PATH\"" >> "$HOME/.zshrc"
 else
     echo "Nvim is already installed. Skip installing it."
 fi
@@ -142,8 +119,20 @@ then
   sudo apt install ripgrep
 fi
 
-if [[ -f ~/.config/starship.toml ]]; then
-  conda install -c conda-forge starship
+if [[ ! -f ~/.config/starship.toml ]]; then
+  curl -sS https://starship.rs/install.sh | sh
+  ln -s ~/.starship.toml ~/.config/starship.toml
+fi
+
+if ! command -v autojump &> /dev/null
+then
+  sudo apt install autojump
+fi
+
+if ! command -v unzip &> /dev/null
+then
+  sudo apt install zip
+  sudo apt install unzip
 fi
 
 echo "Finished installation process!"
