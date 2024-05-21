@@ -22,7 +22,7 @@ USE_BASH_SHELL=false
 
 if ! command -v zsh &> /dev/null
 then
-  apt install zsh
+  sudo apt install zsh
 fi
 
 if [[ ! -d ~/.oh-my-zsh/ ]]; then
@@ -134,12 +134,12 @@ fi
 
 if ! command -v nnn &> /dev/null
 then
-  sudo apt-get install nnn
+  sudo apt install nnn
 fi
 
 if ! command -v rg &> /dev/null
 then
-  sudo apt-get install ripgrep
+  sudo apt install ripgrep
 fi
 
 if [[ -f ~/.config/starship.toml ]]; then
